@@ -10,3 +10,4 @@ __pycache__/
 input.txt
 hook.py
 gns_utils.py
+nano_gpt_env/
