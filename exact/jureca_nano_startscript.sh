@@ -4,11 +4,11 @@
 #SBATCH --account=jhpc54
 #SBATCH --mail-user=
 #SBATCH --mail-type=ALL
-#SBATCH --output=nanoGNS_test.out
-#SBATCH --time=01:00:00
+#SBATCH --output=nanoGNS_%A_%a.out
+#SBATCH --time=04:00:00
 
 # configure node and process count on the CM
-#SBATCH --partition=dc-gpu-devel
+#SBATCH --partition=dc-gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=128
@@ -17,26 +17,43 @@
 #SBATCH --gres=gpu:4
 #SBATCH --exclusive
 
+#SBATCH --array=0-3
+
 ml Python CUDA NCCL matplotlib
 
 source nano_gpt_env/bin/activate
 
 # Calculate derived parameters
 
-width=256
-lr=0.00390625
+# Create array of all combinations
+declare -a combinations
+index=0
+for width in 256 512 1024 2048
+do
+    for lr in  0.00390625 
+    do
+        combinations[$index]="$width $lr"
+        index=$((index + 1))
+    done
+done
+
+# Get parameters for this array task
+parameters=(${combinations[${SLURM_ARRAY_TASK_ID}]})
+width=${parameters[0]}
+lr=${parameters[1]}
+
 head_size=64
 n_heads=$((width / head_size))
 min_lr=$(awk "BEGIN {print $lr/10}")
-out_dir="out/"
-mup_base_width=256
-mup_width_multiplier=$(echo "scale=8; $width/$mup_base_width" | bc -l)
+out_dir="out/width_${width}_lr_${lr}/"
 
 echo "Running with width=$width, lr=$lr"
 
 COMMAND="train.py --out_dir=$out_dir \
+                --n_head=$n_heads \
+                --n_embd=$width \
+                --learning_rate=$lr \
                 "
-
 
 # sleep a sec
 sleep 1
