@@ -45,14 +45,53 @@ lr=${parameters[1]}
 head_size=64
 n_heads=$((width / head_size))
 min_lr=$(awk "BEGIN {print $lr/10}")
-out_dir="out/width_${width}_lr_${lr}/"
+n_layer=2
 
-echo "Running with width=$width, lr=$lr"
+gradient_accumulation_steps=4
+batch_size=12
+num_nodes=${SLURM_JOB_NUM_NODES}
+# 1000 warmup steps
+warmup_tokens=$((1024 * batch_size * gradient_accumulation_steps * num_nodes * 4 * 1000))
+
+out_dir="/p/scratch/cslfse/aach1/mup_logs/gns_sp/layers_${n_layer}_width_${width}_lr_${lr}/"
+
+echo "Running with layers=$n_layer, width=$width, lr=$lr, warmup_tokens=$warmup_tokens"
 
 COMMAND="train.py --out_dir=$out_dir \
+                --eval_interval=2000 \
+                --log_interval=1 \
+                --eval_iters=1 \
+                --eval_only=False \
+                --always_save_checkpoint=False \
+                --init_from = 'scratch' \
+                --wandb_log=False \
+                --dataset="openwebtext" \
+                --gradient_accumulation_steps=4 \
+                --batch_size=12 \
+                --block_size=1024 \
+                --n_layer=$n_layer \
                 --n_head=$n_heads \
                 --n_embd=$width \
+                --dropout=0.0 \
+                --bias=False \
+                --lnclass='nn' \
                 --learning_rate=$lr \
+                --max_iters=5000 \
+                --max-token=10000000000 \
+                --weight-decay=1e-1 \
+                --beta1=0.9 \
+                --beta2=0.95 \
+                --grad_clip=1.0 \
+                --bs_schedule=False \
+                --decay_lr=False \
+                --warmup_tokens=0 \
+                --lr_decay_tokens=0 \
+                --min_lr=$min_lr \
+                --backend='nccl' \
+                --device='cuda' \
+                --device_name='A100' \
+                --dtype='bfloat16' \
+                --compile=True \
                 "
 
 # sleep a sec
