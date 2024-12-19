@@ -8,3 +8,5 @@ __pycache__/
 *.pt
 *.pyc
 input.txt
+old/
+nano_gpt_env_juwels/
