@@ -6,12 +6,13 @@ steps = []
 ddp_gns_values = []
 val_losses = []
 
-widths = [256, 512, 1024]
-
+widths = [256, 512, 1024, 2048]
+n_layer = 2
+lr = 0.00390625
 plt.figure(1)
 for width in widths:
     # Read the CSV file
-    with open(f'out/width_{width}_lr_0.00390625/log.csv', 'r') as file:
+    with open(f'/p/scratch/cslfse/aach1/mup_logs/gns_sp/layers_{n_layer}_width_{width}_lr_{lr}/log.csv', 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
             steps.append(int(row['step']))
@@ -32,7 +33,7 @@ plt.savefig("gns_plot_widths.png", dpi = 300)
 plt.figure(2)
 for width in widths:
     # Read the CSV file
-    with open(f'out/width_{width}_lr_0.00390625/log.csv', 'r') as file:
+    with open(f'/p/scratch/cslfse/aach1/mup_logs/gns_sp/layers_{n_layer}_width_{width}_lr_{lr}/log.csv', 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
             steps.append(int(row['step']))

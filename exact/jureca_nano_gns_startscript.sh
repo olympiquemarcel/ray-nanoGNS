@@ -63,7 +63,7 @@ COMMAND="train.py --out_dir=$out_dir \
                 --eval_iters=1 \
                 --eval_only=False \
                 --always_save_checkpoint=False \
-                --init_from = 'scratch' \
+                --init_from='scratch' \
                 --wandb_log=False \
                 --dataset="openwebtext" \
                 --gradient_accumulation_steps=4 \
@@ -77,8 +77,8 @@ COMMAND="train.py --out_dir=$out_dir \
                 --lnclass='nn' \
                 --learning_rate=$lr \
                 --max_iters=5000 \
-                --max-token=10000000000 \
-                --weight-decay=1e-1 \
+                --max_tokens=10000000000 \
+                --weight_decay=1e-1 \
                 --beta1=0.9 \
                 --beta2=0.95 \
                 --grad_clip=1.0 \
