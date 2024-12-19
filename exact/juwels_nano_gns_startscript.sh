@@ -1,27 +1,27 @@
 #!/bin/bash
 # general configuration of the job
 #SBATCH --job-name=nanoGNS
-#SBATCH --account=jhpc54
+#SBATCH --account=genai-ad
 #SBATCH --mail-user=
 #SBATCH --mail-type=ALL
 #SBATCH --output=nanoGNS_%A_%a.out
-#SBATCH --time=04:00:00
+#SBATCH --time=02:00:00
 
 # configure node and process count on the CM
-#SBATCH --partition=dc-gpu
-#SBATCH --nodes=1
+#SBATCH --partition=booster
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
+#SBATCH --cpus-per-task=48
 #SBATCH --threads-per-core=1
 #SBATCH --gpus-per-node=4
 #SBATCH --gres=gpu:4
 #SBATCH --exclusive
 
-#SBATCH --array=0-3
+#SBATCH --array=0-15
 
 ml Python CUDA NCCL matplotlib
 
-source nano_gpt_env/bin/activate
+source nano_gpt_env_juwels/bin/activate
 
 # Calculate derived parameters
 
@@ -30,7 +30,7 @@ declare -a combinations
 index=0
 for width in 256 512 1024 2048
 do
-    for lr in  0.00390625 
+    for lr in  0.015625 0.0078125 0.00390625 0.001953125
     do
         combinations[$index]="$width $lr"
         index=$((index + 1))
@@ -47,8 +47,8 @@ n_heads=$((width / head_size))
 min_lr=$(awk "BEGIN {print $lr/10}")
 n_layer=12
 
-gradient_accumulation_steps=4
-batch_size=12
+gradient_accumulation_steps=8
+batch_size=6
 num_nodes=${SLURM_JOB_NUM_NODES}
 # 1000 warmup steps
 warmup_tokens=$((1024 * batch_size * gradient_accumulation_steps * num_nodes * 4 * 1000))
@@ -76,9 +76,9 @@ COMMAND="train.py --out_dir=$out_dir \
                 --bias=False \
                 --lnclass='nn' \
                 --learning_rate=$lr \
-                --max_iters=5000 \
-                --max_tokens=10000000000 \
-                --weight_decay=1e-1 \
+                --max_iters=10000 \
+                --max_tokens=10**12 \
+                --weight_decay=0.0 \
                 --beta1=0.9 \
                 --beta2=0.95 \
                 --grad_clip=1.0 \

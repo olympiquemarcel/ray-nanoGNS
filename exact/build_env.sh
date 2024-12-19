@@ -1,8 +1,8 @@
 ml Python CUDA NCCL
 
-python3 -m venv nano_gpt_env
+python3 -m venv nano_gpt_env_juwels
 
-source nano_gpt_env/bin/activate
+source nano_gpt_env_juwels/bin/activate
   
 pip3 install --no-cache-dir torch==2.1.0+cu121 torchvision --index-url https://download.pytorch.org/whl/cu121
 

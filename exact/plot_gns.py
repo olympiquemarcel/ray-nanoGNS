@@ -7,7 +7,7 @@ ddp_gns_values = []
 val_losses = []
 
 widths = [256, 512, 1024, 2048]
-n_layer = 2
+n_layer = 12
 lr = 0.00390625
 plt.figure(1)
 for width in widths:
@@ -47,7 +47,7 @@ for width in widths:
 # # Plot the data
 plt.xlabel('Step')
 plt.ylabel('train/loss')
-plt.title('Step vs val/loss')
+plt.title('Step vs train/loss')
 plt.legend()
 plt.savefig("train_loss_widths.png", dpi = 300)
 
