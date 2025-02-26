@@ -37,8 +37,8 @@ import ddpgns
 from tracker import LogWrapper
 
 PEGradNormFusedLayerNorm = None
-if os.environ.get('CUDA_HOME', False):
-    from fused_gns import PEGradNormFusedLayerNorm
+# if os.environ.get('CUDA_HOME', False):
+#     from fused_gns import PEGradNormFusedLayerNorm
 
 # -----------------------------------------------------------------------------
 # default config values designed to train a gpt2 (124M) on OpenWebText
@@ -69,7 +69,7 @@ linearclass = 'nn' # gns:PEGradNormLinear or shim:PEGradNormShimLinear or nn:nn.
 embeddingclass = 'nn' # gns:PEGradNormEmbedding or shim:PEGradNormShimEmbedding or nn:nn.Embedding
 lnclass = 'nn' # shim:PEGradNormSeparatedLayerNorm or nn:nn.LayerNorm or fused:PEGradNormFusedLayerNorm
 spectral_c_attn = [] # block indexes to use spectralnorm on QKV projection
-cos_attn = [] # block indexes to use cosine attention
+cos_attn = [1] # block indexes to use cosine attention
 # adamw optimizer
 learning_rate = 6e-4 # max learning rate
 max_iters = 1000 # total number of training iterations
@@ -482,8 +482,8 @@ while True:
     # termination conditions
     if final_iter:
         break
-    if iter_num > max_iters:
-        final_iter = True
+    # if iter_num > max_iters:
+    #     final_iter = True
     if max_tokens is not None:
         if raw_model.tokens_processed.item() > max_tokens:
             final_iter = True
